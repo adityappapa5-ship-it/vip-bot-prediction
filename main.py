@@ -7,12 +7,12 @@ import os
 from flask import Flask
 from threading import Thread
 
-# --- FLASK SERVER FOR RAILWAY ---
+# --- RAILWAY/RENDER KE LIYE SERVER ---
 app = Flask('')
 
 @app.route('/')
 def home():
-    return "Bot is Running!"
+    return "Bot is Online!"
 
 def run():
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
@@ -21,8 +21,8 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# --- BOT CONFIGURATION ---
-API_TOKEN = '8669987861:AAG-6BEb8ykG8A4VGUVcBE7-wCH9myfBDCs'
+# --- NEW BOT CONFIGURATION ---
+API_TOKEN = '8753644667:AAFONCU_7vr313gJ2bIPpspviw6RqAn9p0w'
 CHANNELS = [-1003973812867, -1003942030008]
 API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json"
 
@@ -56,6 +56,7 @@ def start(message):
         show_game_menu(message.chat.id)
     else:
         markup = types.InlineKeyboardMarkup()
+        # Inki jagah apne asli channel links dalna mat bhulna
         markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 1", url="https://t.me/your_link1"))
         markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 2", url="https://t.me/your_link2"))
         markup.add(types.InlineKeyboardButton("✅ VERIFY JOIN REQUEST", callback_data="verify_join"))
@@ -92,7 +93,7 @@ def handle_query(call):
             f"━━━━━━━━━━━━━━━━━━\n"
             f"🔢 <b>PERIOD:</b> <code>{next_p}</code>\n"
             f"🎯 <b>RESULT:</b> {res}\n"
-            f"✨ <b>STATUS:</b> {status}\n"
+            f"✨ <b>STATUS: {status}</b>\n"
             f"━━━━━━━━━━━━━━━━━━"
         )
         markup = types.InlineKeyboardMarkup()
@@ -113,6 +114,6 @@ def game_select(message):
     bot.send_message(message.chat.id, f"🎯 <b>GAME: {message.text}</b>\nChoose Mode:", parse_mode="HTML", reply_markup=markup)
 
 if __name__ == "__main__":
-    keep_alive()
-    print("Bot is starting...")
+    keep_alive() # Server start karega
+    print("Bot is starting with new Token...")
     bot.infinity_polling(timeout=20, long_polling_timeout=10)
