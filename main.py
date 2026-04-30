@@ -39,19 +39,17 @@ def start(message):
         show_game_menu(message.chat.id)
     else:
         markup = types.InlineKeyboardMarkup()
-        # Apne real invite links yahan replace kar dena
-        markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 1", url="https://t.me/your_link1"))
-        markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 2", url="https://t.me/your_link2"))
-        markup.add(types.InlineKeyboardButton("✅ VERIFY REQUEST", callback_data="verify_join"))
+        # In links ki jagah apne real channel links daal dena
+        markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 1", url="https://t.me/your_channel_1"))
+        markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 2", url="https://t.me/your_channel_2"))
+        markup.add(types.InlineKeyboardButton("✅ VERIFY JOIN REQUEST", callback_data="verify_join"))
         bot.send_message(message.chat.id, "<b>❌ ACCESS DENIED!</b>\n\nPehle dono channels join karo.", 
                          parse_mode="HTML", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
-    user_id = call.from_user.id
-    
     if call.data == "verify_join":
-        if is_user_joined(user_id):
+        if is_user_joined(call.from_user.id):
             bot.answer_callback_query(call.id, "✅ Verified!")
             show_game_menu(call.message.chat.id)
         else:
@@ -61,17 +59,14 @@ def handle_query(call):
         game_name = call.data.split("_")[1]
         mode_type = call.data.split("_")[2]
         
-        # 1. Pehle Wait/Check effect
         bot.edit_message_text("🔄 <b>Checking API Result...</b>", call.message.chat.id, call.message.message_id, parse_mode="HTML")
         time.sleep(2)
         
-        # 2. Win/Loss Status
         status = random.choice(["✅ WIN", "✅ WIN", "❌ LOSS"])
         bot.edit_message_text(f"📊 <b>LAST STATUS:</b> {status}\n\n<i>Analysing next period...</i>", 
                               call.message.chat.id, call.message.message_id, parse_mode="HTML")
         time.sleep(2)
         
-        # 3. Final Prediction with API Period
         period = get_api_period()
         next_p = int(period) + 1
         res = random.choice(["🔴 RED", "🟢 GREEN"]) if mode_type == "redgreen" else random.choice(["🌕 BIG", "🌑 SMALL"])
@@ -102,4 +97,3 @@ def game_select(message):
     bot.send_message(message.chat.id, f"🎯 <b>GAME: {message.text}</b>\nChoose Mode:", parse_mode="HTML", reply_markup=markup)
 
 bot.polling()
-      
