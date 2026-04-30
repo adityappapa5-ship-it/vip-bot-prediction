@@ -9,7 +9,7 @@ from threading import Thread
 # --- SERVER FOR RAILWAY ---
 app = Flask('')
 @app.route('/')
-def home(): return "AFEEM HACK ACTIVE"
+def home(): return "WAR ZONE ACTIVE"
 def run(): app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 def keep_alive(): Thread(target=run).start()
 
@@ -21,18 +21,17 @@ API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.jso
 bot = telebot.TeleBot(API_TOKEN)
 GAMES = ["RAJA GAME", "JALVA", "DU WIN", "DM WIN", "55 CLUB", "91 CLUB", "LOTTERY 7"]
 
-# --- API DATA FETCH ---
+# --- API DATA ---
 def get_latest_data():
     try:
         response = requests.get(API_URL, timeout=10).json()
         latest = response['data']['list'][0]
         return {
             "period": latest['issueNumber'],
-            "result": latest['colour'], # 'red', 'green', ya 'red_green'
-            "number": latest['number']
+            "result_color": latest['colour'].upper(),
+            "result_size": "BIG" if int(latest['number']) >= 5 else "SMALL"
         }
-    except:
-        return None
+    except: return None
 
 # --- MEMBER CHECK ---
 def check_status(user_id):
@@ -43,79 +42,94 @@ def check_status(user_id):
         except: return False
     return True
 
-# --- START COMMAND ---
+# --- 1. START & JOIN CHECK ---
 @bot.message_handler(commands=['start'])
 def start(message):
     if check_status(message.from_user.id):
-        # Chat mein Game Select karne ke liye Button Menu
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-        markup.add(*[types.KeyboardButton(g) for g in GAMES])
-        bot.send_message(message.chat.id, 
-            "<b>🔥 ADITYA PAPA AFEEM HACK 🔥</b>\n\n"
-            "<i>Select your game from the chat menu below:</i>", 
-            parse_mode="HTML", reply_markup=markup)
+        show_game_menu(message.chat.id)
     else:
         markup = types.InlineKeyboardMarkup(row_width=1)
         markup.add(
-            types.InlineKeyboardButton("🚩 JOIN WAR ZONE 1", url="https://t.me/ADITYAVIPXPAPA"),
-            types.InlineKeyboardButton("🚩 JOIN WAR ZONE 2", url="https://t.me/ADITYAVIPWIN"),
-            types.InlineKeyboardButton("✅ VERIFY ACCESS", callback_data="verify")
+            types.InlineKeyboardButton("🚩 JOIN ADITYAVIPXPAPA", url="https://t.me/ADITYAVIPXPAPA"),
+            types.InlineKeyboardButton("🚩 JOIN ADITYAVIPWIN", url="https://t.me/ADITYAVIPWIN"),
+            types.InlineKeyboardButton("✅ VERIFY & ENTER CHAT", callback_data="verify")
         )
-        bot.send_message(message.chat.id, "❌ <b>ACCESS DENIED!</b>\nJoin Both Channels First!", parse_mode="HTML", reply_markup=markup)
+        bot.send_message(message.chat.id, 
+            "⚔️ <b>WAR ZONE ACCESS LOCKED</b> ⚔️\n\n"
+            "<i>Bhai, pehle dono channels join karo tabhi verification success hoga!</i>", 
+            parse_mode="HTML", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data == "verify")
 def verify(call):
     if check_status(call.from_user.id):
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        start(call.message)
+        show_game_menu(call.message.chat.id)
     else:
-        bot.answer_callback_query(call.id, "Join kar pehle madrachod!", show_alert=True)
+        bot.answer_callback_query(call.id, "Abe Join Kar Pehle! System check fail.", show_alert=True)
 
-# --- PREDICTION LOGIC (WAIT & RESULT) ---
+# --- 2. GAME SELECTION MENU ---
+def show_game_menu(chat_id):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup.add(*[types.KeyboardButton(g) for g in GAMES])
+    bot.send_message(chat_id, 
+        "🩸 <b>ADITYA PAPA VIP CHAT</b> 🩸\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        "<b>Bhai, Chat mein se apna Game select karo:</b>", 
+        parse_mode="HTML", reply_markup=markup)
+
+# --- 3. MODE SELECTION ---
 @bot.message_handler(func=lambda m: m.text in GAMES)
-def handle_game(message):
-    game = message.text
-    bot.send_message(message.chat.id, f"💉 <b>{game} Injecting...</b>", parse_mode="HTML")
+def game_select(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("🔴 RED vs GREEN 🟢", callback_data=f"mode_{message.text}_rg"),
+               types.InlineKeyboardButton("🌕 BIG vs SMALL 🌑", callback_data=f"mode_{message.text}_bs"))
+    bot.send_message(message.chat.id, f"🎯 <b>TARGET: {message.text}</b>\nSelect Prediction Mode:", parse_mode="HTML", reply_markup=markup)
+
+# --- 4. PREDICTION & WAIT LOGIC ---
+@bot.callback_query_handler(func=lambda call: call.data.startswith("mode_"))
+def handle_prediction(call):
+    _, game, mode = call.data.split("_")
     
-    # 1. Get Current Data
+    # API Se Period Lena
     data = get_latest_data()
     if not data:
-        bot.send_message(message.chat.id, "⚠️ API Error! Try again later.")
+        bot.answer_callback_query(call.id, "API Error!")
         return
 
-    current_period = data['period']
-    next_period = int(current_period) + 1
-    prediction = random.choice(["🔴 RED", "🟢 GREEN"])
+    next_period = int(data['period']) + 1
+    pred = random.choice(["🔴 RED", "🟢 GREEN"]) if mode == "rg" else random.choice(["🌕 BIG", "🌑 SMALL"])
 
-    # 2. Show Prediction
-    msg = bot.send_message(message.chat.id, 
-        f"⚔️ <b>{game} WAR PREDICTION</b> ⚔️\n"
+    bot.edit_message_text(
+        f"⚔️ <b>{game} PREDICTION</b> ⚔️\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
         f"🔢 <b>PERIOD:</b> <code>{next_period}</code>\n"
-        f"🎯 <b>PREDICTION: {prediction}</b>\n"
-        f"⏳ <b>STATUS:</b> <i>Waiting for result...</i>\n"
-        f"━━━━━━━━━━━━━━━━━━━━", parse_mode="HTML")
+        f"🎯 <b>PREDICTION: {pred}</b>\n\n"
+        f"⏳ <b>STATUS:</b> <i>Waiting for Result (30s)...</i>\n"
+        f"━━━━━━━━━━━━━━━━━━━━", 
+        call.message.chat.id, call.message.message_id, parse_mode="HTML")
 
-    # 3. Wait for Period to Finish (30 Sec Game)
-    time.sleep(30) 
+    # Game khatam hone ka wait
+    time.sleep(30)
 
-    # 4. Fetch Result and Compare
+    # Result Check
     new_data = get_latest_data()
-    actual_color = new_data['result'].upper()
+    actual = new_data['result_color'] if mode == "rg" else new_data['result_size']
     
-    status_msg = "✅ <b>WINNER (AFEEM)</b>" if prediction.split()[1] in actual_color else "❌ <b>LOSS</b>"
+    win_loss = "✅ <b>WINNER (AFEEM)</b>" if pred.split()[1] in actual else "❌ <b>LOSS</b>"
 
-    final_text = (
-        f"⚔️ <b>{game} RESULT</b> ⚔️\n"
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("🔄 NEXT PREDICTION", callback_data=call.data))
+
+    bot.edit_message_text(
+        f"⚔️ <b>{game} WAR RESULT</b> ⚔️\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
         f"🔢 <b>PERIOD:</b> <code>{next_period}</code>\n"
-        f"🎯 <b>RESULT:</b> {actual_color}\n"
-        f"💉 <b>STATUS:</b> {status_msg}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"🚀 <i>Next prediction starting...</i>"
-    )
-    bot.edit_message_text(final_text, message.chat.id, msg.message_id, parse_mode="HTML")
+        f"🎯 <b>RESULT:</b> {actual}\n"
+        f"💉 <b>STATUS:</b> {win_loss}\n"
+        f"━━━━━━━━━━━━━━━━━━━━", 
+        call.message.chat.id, call.message.message_id, parse_mode="HTML", reply_markup=markup)
 
 if __name__ == "__main__":
     keep_alive()
     bot.infinity_polling()
+
