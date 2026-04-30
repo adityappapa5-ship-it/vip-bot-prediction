@@ -3,8 +3,25 @@ import telebot
 from telebot import types
 import random
 import time
+import os
+from flask import Flask
+from threading import Thread
 
-# --- CONFIGURATION ---
+# --- FLASK SERVER FOR RAILWAY ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is Running!"
+
+def run():
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# --- BOT CONFIGURATION ---
 API_TOKEN = '8669987861:AAG-6BEb8ykG8A4VGUVcBE7-wCH9myfBDCs'
 CHANNELS = [-1003973812867, -1003942030008]
 API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json"
@@ -39,9 +56,8 @@ def start(message):
         show_game_menu(message.chat.id)
     else:
         markup = types.InlineKeyboardMarkup()
-        # In links ki jagah apne real channel links daal dena
-        markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 1", url="https://t.me/your_channel_1"))
-        markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 2", url="https://t.me/your_channel_2"))
+        markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 1", url="https://t.me/your_link1"))
+        markup.add(types.InlineKeyboardButton("📢 JOIN CHANNEL 2", url="https://t.me/your_link2"))
         markup.add(types.InlineKeyboardButton("✅ VERIFY JOIN REQUEST", callback_data="verify_join"))
         bot.send_message(message.chat.id, "<b>❌ ACCESS DENIED!</b>\n\nPehle dono channels join karo.", 
                          parse_mode="HTML", reply_markup=markup)
@@ -63,7 +79,7 @@ def handle_query(call):
         time.sleep(2)
         
         status = random.choice(["✅ WIN", "✅ WIN", "❌ LOSS"])
-        bot.edit_message_text(f"📊 <b>LAST STATUS:</b> {status}\n\n<i>Analysing next period...</i>", 
+        bot.edit_message_text(f"📊 <b>LAST STATUS: {status}</b>\n\n<i>Analysing next period...</i>", 
                               call.message.chat.id, call.message.message_id, parse_mode="HTML")
         time.sleep(2)
         
@@ -96,4 +112,7 @@ def game_select(message):
                types.InlineKeyboardButton("🌕 BIG/SMALL", callback_data=f"mode_{message.text}_bigsmall"))
     bot.send_message(message.chat.id, f"🎯 <b>GAME: {message.text}</b>\nChoose Mode:", parse_mode="HTML", reply_markup=markup)
 
-bot.polling()
+if __name__ == "__main__":
+    keep_alive()
+    print("Bot is starting...")
+    bot.infinity_polling(timeout=20, long_polling_timeout=10)
