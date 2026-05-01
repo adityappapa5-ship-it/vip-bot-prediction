@@ -6,7 +6,7 @@ from threading import Thread
 # --- SERVER FOR 24/7 CLOUD ---
 app = Flask('')
 @app.route('/')
-def home(): return "ADITYA VIP CRACK IS LIVE 24/7"
+def home(): return "ADITYA VIP BYPASS ACTIVE"
 def run(): app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 
 # --- CONFIG ---
@@ -18,61 +18,52 @@ API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json
 
 bot = telebot.TeleBot(API_TOKEN)
 
-def check_join(uid):
-    """Channel Join Verification Logic"""
-    for c in CHANNELS:
-        try:
-            status = bot.get_chat_member(c, uid).status
-            if status in ['left', 'kicked']: return False
-        except: continue
-    return True
-
-def get_data_ultimate():
+def get_data_bypass():
+    """Advanced Human-Like Headers to fix API Error"""
+    user_agents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    ]
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json, text/plain, */*'
+        'User-Agent': random.choice(user_agents),
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Origin': 'https://ar-lottery01.com',
+        'Referer': 'https://ar-lottery01.com/',
+        'Sec-Ch-Ua': '"Not-A.Brand";v="99", "Chromium";v="124"',
+        'Sec-Ch-Ua-Mobile': '?0',
+        'Sec-Ch-Ua-Platform': '"Windows"',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-site'
     }
     try:
         r = requests.get(API_URL, headers=headers, timeout=20)
-        return r.json()['data']['list']
-    except: return None
+        if r.status_code == 200:
+            return r.json()['data']['list']
+        else:
+            print(f"API Error Code: {r.status_code}")
+            return None
+    except Exception as e:
+        print(f"Request Failed: {e}")
+        return None
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    if check_join(message.from_user.id):
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        markup.add(types.KeyboardButton("🔥 𝗔𝗖𝗧𝗜𝗩𝗔𝗧𝗘 𝗖𝗥𝗔𝗖𝗞 𝗘𝗡𝗚𝗜𝗡𝗘 🔥"))
-        bot.send_message(message.chat.id, "☠️ <b>𝕬𝕯𝕴𝕿𝖄𝕬 𝖁𝕴𝕻 𝕮𝕽𝕬𝕮𝕶</b> 💀\n\nStatus: <b>ACCESS GRANTED</b> ✅", parse_mode="HTML", reply_markup=markup)
-    else:
-        markup = types.InlineKeyboardMarkup(row_width=1)
-        markup.add(
-            types.InlineKeyboardButton("🚩 JOIN VIP CHANNEL 1", url="https://t.me/+45fCzXzXxi0zMWI9"),
-            types.InlineKeyboardButton("🚩 JOIN VIP CHANNEL 2", url="https://t.me/+_RZ0gN9HU6xhZTRl"),
-            types.InlineKeyboardButton("✅ VERIFY JOIN", callback_data="v")
-        )
-        bot.send_message(message.chat.id, "❌ <b>ACCESS LOCKED</b> ❌\nBhai, pehle channel join karo tabhi prediction dikhega!", parse_mode="HTML", reply_markup=markup)
-
-@bot.callback_query_handler(func=lambda c: c.data == "v")
-def v(c):
-    if check_join(c.from_user.id):
-        bot.answer_callback_query(c.id, "Success! Press /start now.")
-        start(c.message)
-    else:
-        bot.answer_callback_query(c.id, "Pehle join kar Madrachod!", show_alert=True)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(types.KeyboardButton("🔥 𝗔𝗖𝗧𝗜𝗩𝗔𝗧𝗘 𝗖𝗥𝗔𝗖𝗞 𝗘𝗡𝗚𝗜𝗡𝗘 🔥"))
+    bot.send_message(message.chat.id, "☠️ <b>𝕬𝕯𝕴𝕿𝖄𝕬 𝖁𝕴𝕻 𝕮𝕽𝕬𝕮𝕶</b> 💀\n\nStatus: <b>BYPASS SYSTEM ACTIVE</b> ✅", parse_mode="HTML", reply_markup=markup)
 
 @bot.message_handler(func=lambda m: m.text == "🔥 𝗔𝗖𝗧𝗜𝗩𝗔𝗧𝗘 𝗖𝗥𝗔𝗖𝗞 𝗘𝗡𝗚𝗜𝗡𝗘 🔥")
 def engine(message):
-    if not check_join(message.from_user.id):
-        bot.send_message(message.chat.id, "❌ Join kar pehle!")
-        return
-        
     bot.send_message(message.chat.id, "🛰️ <b>𝕮𝖗𝖆𝖈𝖐𝖎𝖓𝖌 𝖂𝖎𝖓𝕲𝖔 𝕬𝕻𝕴...</b>", parse_mode="HTML")
     last_p = None
     while True:
         try:
-            history = get_data_ultimate()
+            history = get_data_bypass()
             if not history:
-                time.sleep(2); continue
+                time.sleep(10); continue # API Error wait
             
             curr_p = history[0]['issueNumber']
             if curr_p != last_p:
@@ -90,15 +81,11 @@ def engine(message):
                     f"━━━━━━━━━━━━━━━━━━━"
                 )
                 bot.send_message(message.chat.id, box, parse_mode="HTML")
-                
                 time.sleep(55)
-                res = requests.get(API_URL).json()['data']['list'][0]
-                if int(res['issueNumber']) == next_p:
-                    actual = "BIG" if int(res['number']) >= 5 else "SMALL"
-                    bot.send_sticker(message.chat.id, WIN_STICKER if pred.split()[1] == actual else LOSS_STICKER)
             time.sleep(2)
         except: time.sleep(5)
 
 if __name__ == "__main__":
     Thread(target=run).start()
-    bot.infinity_polling(timeout=15, long_polling_timeout=10)
+    bot.infinity_polling()
+    
