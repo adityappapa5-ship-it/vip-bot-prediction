@@ -1,13 +1,12 @@
-rm -f main.py requirements.txt Procfile && cat <<EOF > main.py
 import requests, telebot, time, random, os
 from telebot import types
 from flask import Flask
 from threading import Thread
 
-# --- CLOUD KEEP-ALIVE SERVER ---
+# --- SERVER FOR 24/7 CLOUD ---
 app = Flask('')
 @app.route('/')
-def home(): return "ADITYA VIP CRACK IS ONLINE 24/7"
+def home(): return "ADITYA VIP CRACK IS LIVE 24/7"
 def run(): app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 
 # --- CONFIG ---
@@ -19,11 +18,19 @@ API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json
 
 bot = telebot.TeleBot(API_TOKEN)
 
-def get_data_bypass():
+def check_join(uid):
+    """Channel Join Verification Logic"""
+    for c in CHANNELS:
+        try:
+            status = bot.get_chat_member(c, uid).status
+            if status in ['left', 'kicked']: return False
+        except: continue
+    return True
+
+def get_data_ultimate():
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Origin': 'https://ar-lottery01.com'
+        'Accept': 'application/json, text/plain, */*'
     }
     try:
         r = requests.get(API_URL, headers=headers, timeout=20)
@@ -32,17 +39,38 @@ def get_data_bypass():
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("🔥 𝗔𝗖𝗧𝗜𝗩𝗔𝗧𝗘 𝗖𝗥𝗔𝗖𝗞 𝗘𝗡𝗚𝗜𝗡𝗘 🔥"))
-    bot.send_message(message.chat.id, "☠️ <b>𝕬𝕯𝕴𝕿𝖄𝕬 𝖁𝕴𝕻 𝕮𝕽𝕬𝕮𝕶</b> 💀\n\nStatus: <b>INFINITY CLOUD ACTIVE</b> 🚀", parse_mode="HTML", reply_markup=markup)
+    if check_join(message.from_user.id):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.add(types.KeyboardButton("🔥 𝗔𝗖𝗧𝗜𝗩𝗔𝗧𝗘 𝗖𝗥𝗔𝗖𝗞 𝗘𝗡𝗚𝗜𝗡𝗘 🔥"))
+        bot.send_message(message.chat.id, "☠️ <b>𝕬𝕯𝕴𝕿𝖄𝕬 𝖁𝕴𝕻 𝕮𝕽𝕬𝕮𝕶</b> 💀\n\nStatus: <b>ACCESS GRANTED</b> ✅", parse_mode="HTML", reply_markup=markup)
+    else:
+        markup = types.InlineKeyboardMarkup(row_width=1)
+        markup.add(
+            types.InlineKeyboardButton("🚩 JOIN VIP CHANNEL 1", url="https://t.me/+45fCzXzXxi0zMWI9"),
+            types.InlineKeyboardButton("🚩 JOIN VIP CHANNEL 2", url="https://t.me/+_RZ0gN9HU6xhZTRl"),
+            types.InlineKeyboardButton("✅ VERIFY JOIN", callback_data="v")
+        )
+        bot.send_message(message.chat.id, "❌ <b>ACCESS LOCKED</b> ❌\nBhai, pehle channel join karo tabhi prediction dikhega!", parse_mode="HTML", reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda c: c.data == "v")
+def v(c):
+    if check_join(c.from_user.id):
+        bot.answer_callback_query(c.id, "Success! Press /start now.")
+        start(c.message)
+    else:
+        bot.answer_callback_query(c.id, "Pehle join kar Madrachod!", show_alert=True)
 
 @bot.message_handler(func=lambda m: m.text == "🔥 𝗔𝗖𝗧𝗜𝗩𝗔𝗧𝗘 𝗖𝗥𝗔𝗖𝗞 𝗘𝗡𝗚𝗜𝗡𝗘 🔥")
 def engine(message):
+    if not check_join(message.from_user.id):
+        bot.send_message(message.chat.id, "❌ Join kar pehle!")
+        return
+        
     bot.send_message(message.chat.id, "🛰️ <b>𝕮𝖗𝖆𝖈𝖐𝖎𝖓𝖌 𝖂𝖎𝖓𝕲𝖔 𝕬𝕻𝕴...</b>", parse_mode="HTML")
     last_p = None
     while True:
         try:
-            history = get_data_bypass()
+            history = get_data_ultimate()
             if not history:
                 time.sleep(2); continue
             
@@ -51,7 +79,6 @@ def engine(message):
                 last_p = curr_p
                 next_p = int(curr_p) + 1
                 
-                # Ultimate Pattern Logic
                 nums = [int(x['number']) for x in history[:3]]
                 pred = "🌕 𝗕𝗜𝗚" if sum(nums)/3 >= 5 else "🌑 𝗦𝗠𝗔𝗟𝗟"
                 
@@ -74,18 +101,4 @@ def engine(message):
 
 if __name__ == "__main__":
     Thread(target=run).start()
-    bot.infinity_polling(timeout=10, long_polling_timeout=5)
-EOF
-
-cat <<EOF > requirements.txt
-pyTelegramBotAPI
-requests
-flask
-EOF
-
-cat <<EOF > Procfile
-worker: python main.py
-EOF
-
-echo "✅ TEENO FILES READY HAIN! GitHub par upload karo aur Koyeb se connect karke Termux delete kar do."
-
+    bot.infinity_polling(timeout=15, long_polling_timeout=10)
