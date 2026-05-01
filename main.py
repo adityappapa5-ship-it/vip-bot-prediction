@@ -7,23 +7,22 @@ import random
 from flask import Flask
 from threading import Thread
 
-# --- SERVER KEEP ALIVE ---
+# --- SERVER FOR RAILWAY ---
 app = Flask('')
 @app.route('/')
-def home(): return "API SERVER CONNECTED"
+def home(): return "AFEEM BOT ACTIVE"
 def run(): app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 def keep_alive(): Thread(target=run).start()
 
-# --- CONFIG ---
+# --- BOT CONFIG ---
 API_TOKEN = '8216633914:AAEphghqpkKSTgvnWTD2ka95BlFwHTGRfyg'
 # Dono Private Channel IDs
 CHANNELS = [-1003815161090, -1003973812867] 
 API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json"
 
 bot = telebot.TeleBot(API_TOKEN)
-GAMES = ["RAJA GAME", "JALVA", "DU WIN", "DM WIN", "55 CLUB", "91 CLUB", "LOTTERY 7"]
 
-# --- API REAL CONNECTION ---
+# --- API DATA FETCH ---
 def get_latest_data():
     try:
         headers = {'User-Agent': 'Mozilla/5.0'}
@@ -32,12 +31,10 @@ def get_latest_data():
             latest = response['data']['list'][0]
             return {
                 "period": latest['issueNumber'],
-                "result_color": str(latest['colour']).upper(),
-                "result_size": "BIG" if int(latest['number']) >= 5 else "SMALL"
+                "color": str(latest['colour']).upper(),
+                "size": "BIG" if int(latest['number']) >= 5 else "SMALL"
             }
-    except Exception as e:
-        print(f"Server Error: {e}")
-        return None
+    except: return None
 
 # --- MEMBER CHECK ---
 def check_status(user_id):
@@ -48,83 +45,93 @@ def check_status(user_id):
         except: return False
     return True
 
-# --- START FLOW ---
+# --- 1. START: CHANNEL JOIN OPTION ---
 @bot.message_handler(commands=['start'])
 def start(message):
     if check_status(message.from_user.id):
-        show_game_menu(message.chat.id)
+        show_start_prediction_button(message.chat.id)
     else:
         markup = types.InlineKeyboardMarkup(row_width=1)
-        # TERE NAYE PRIVATE LINKS
+        # Tere Private Links
         markup.add(
-            types.InlineKeyboardButton("🚩 JOIN FIRST CHANNEL", url="https://t.me/+45fCzXzXxi0zMWI9"),
-            types.InlineKeyboardButton("🚩 JOIN SECOND CHANNEL", url="https://t.me/+IPE8r37yMspjYjQ91"),
-            types.InlineKeyboardButton("✅ VERIFY MY ACCESS", callback_data="verify")
+            types.InlineKeyboardButton("🚩 JOIN PRIVATE CHANNEL 1", url="https://t.me/+45fCzXzXxi0zMWI9"),
+            types.InlineKeyboardButton("🚩 JOIN PRIVATE CHANNEL 2", url="https://t.me/+_RZ0gN9HU6xhZTRl"),
+            types.InlineKeyboardButton("✅ VERIFY JOIN REQUEST", callback_data="verify_user")
         )
-        bot.send_message(message.chat.id, "❌ <b>ACCESS DENIED!</b>\n\nBhai, dono private channels join karo tabhi prediction khulega!", parse_mode="HTML", reply_markup=markup)
+        bot.send_message(message.chat.id, 
+            "⚔️ <b>WAR ZONE ACCESS LOCKED</b> ⚔️\n\n"
+            "<i>Bhai, pehle dono private channels join karo tabhi verification success hoga!</i>", 
+            parse_mode="HTML", reply_markup=markup)
 
-@bot.callback_query_handler(func=lambda call: call.data == "verify")
+# --- 2. VERIFICATION HANDLER ---
+@bot.callback_query_handler(func=lambda call: call.data == "verify_user")
 def verify(call):
     if check_status(call.from_user.id):
+        bot.answer_callback_query(call.id, "✅ Verified Successfully!")
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        show_game_menu(call.message.chat.id)
+        show_start_prediction_button(call.message.chat.id)
     else:
-        bot.answer_callback_query(call.id, "Join Both Channels First!", show_alert=True)
+        bot.answer_callback_query(call.id, "❌ Join kar pehle! Access Denied.", show_alert=True)
 
-def show_game_menu(chat_id):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    markup.add(*[types.KeyboardButton(g) for g in GAMES])
-    bot.send_message(chat_id, "💉 <b>AFEEM VIP START</b> 💉\n\nSelect game target from keyboard:", parse_mode="HTML", reply_markup=markup)
+# --- 3. SHOW "START PREDICTION" BUTTON ---
+def show_start_prediction_button(chat_id):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(types.KeyboardButton("🔥 START PREDICTION 🔥"))
+    bot.send_message(chat_id, 
+        "💉 <b>VERIFICATION COMPLETE!</b> 💉\n\n"
+        "Click the button below to start automatic predictions:", 
+        parse_mode="HTML", reply_markup=markup)
 
-# --- PREDICTION FLOW ---
-@bot.message_handler(func=lambda m: m.text in GAMES)
-def game_target(message):
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("🔴 RED vs GREEN 🟢", callback_data=f"x_{message.text}_rg"),
-               types.InlineKeyboardButton("🌕 BIG vs SMALL 🌑", callback_data=f"x_{message.text}_bs"))
-    bot.send_message(message.chat.id, f"🎯 <b>TARGET: {message.text}</b>\nSelect Hack Mode:", parse_mode="HTML", reply_markup=markup)
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith("x_"))
-def handle_hack(call):
-    _, game, mode = call.data.split("_")
-    data = get_latest_data()
+# --- 4. AUTOMATIC PREDICTION ENGINE ---
+@bot.message_handler(func=lambda m: m.text == "🔥 START PREDICTION 🔥")
+def handle_auto_loop(message):
+    bot.send_message(message.chat.id, "🚀 <b>ADITYA PAPA AUTOMATIC ENGINE STARTED...</b>", parse_mode="HTML")
     
-    if not data:
-        bot.answer_callback_query(call.id, "⚠️ API Server Busy! Waiting for signal...")
-        return
+    # Loop starts here
+    while True:
+        data = get_latest_data()
+        if not data:
+            time.sleep(5)
+            continue
 
-    next_p = int(data['period']) + 1
-    pred = random.choice(["🔴 RED", "🟢 GREEN"]) if mode == "rg" else random.choice(["🌕 BIG", "🌑 SMALL"])
+        next_p = int(data['period']) + 1
+        pred_color = random.choice(["🔴 RED", "🟢 GREEN"])
+        pred_size = random.choice(["🌕 BIG", "🌑 SMALL"])
 
-    bot.edit_message_text(
-        f"⚔️ <b>{game} HACK LIVE</b> ⚔️\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"🔢 <b>PERIOD:</b> <code>{next_p}</code>\n"
-        f"🎯 <b>PREDICTION: {pred}</b>\n"
-        f"⏳ <b>STATUS:</b> <i>Waiting for Result...</i>\n"
-        f"━━━━━━━━━━━━━━━━━━━━", 
-        call.message.chat.id, call.message.message_id, parse_mode="HTML")
+        msg_text = (
+            f"⚔️ <b>ADITYA VIP HACK</b> ⚔️\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"🔢 <b>NEXT PERIOD:</b> <code>{next_p}</code>\n"
+            f"🎨 <b>COLOR:</b> {pred_color}\n"
+            f"📏 <b>SIZE:</b> {pred_size}\n"
+            f"💉 <b>STATUS:</b> SIGNAL ACTIVE\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"⏳ <i>Result aane mein 30s baki...</i>"
+        )
+        
+        # Send Prediction
+        msg = bot.send_message(message.chat.id, msg_text, parse_mode="HTML")
+        
+        # WinGo 30S Wait + Buffer
+        time.sleep(35) 
 
-    time.sleep(30) # Wait for Wingo 30s
-
-    new_data = get_latest_data()
-    if new_data:
-        actual = new_data['result_color'] if mode == "rg" else new_data['result_size']
-        win_status = "✅ <b>WINNER (AFEEM)</b>" if pred.split()[1] in actual else "❌ <b>LOSS</b>"
-    else:
-        actual, win_status = "TIMEOUT", "RE-SCANNING..."
-
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("🔄 NEXT VIP ATTACK", callback_data=call.data))
-
-    bot.edit_message_text(
-        f"⚔️ <b>{game} ATTACK RESULT</b> ⚔️\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"🔢 <b>PERIOD:</b> <code>{next_p}</code>\n"
-        f"🎯 <b>RESULT:</b> {actual}\n"
-        f"💉 <b>STATUS:</b> {win_status}\n"
-        f"━━━━━━━━━━━━━━━━━━━━", 
-        call.message.chat.id, call.message.message_id, parse_mode="HTML", reply_markup=markup)
+        # Result Fetch and Show
+        res_data = get_latest_data()
+        if res_data:
+            actual_c = res_data['color']
+            win_loss = "✅ <b>WIN (AFEEM)</b>" if pred_color.split()[1] in actual_c else "❌ <b>LOSS</b>"
+            
+            result_text = (
+                f"📊 <b>PERIOD {next_p} RESULT</b>\n"
+                f"━━━━━━━━━━━━━━━━━━━━\n"
+                f"🎯 <b>RESULT:</b> {actual_c}\n"
+                f"💉 <b>STATUS:</b> {win_loss}\n"
+                f"━━━━━━━━━━━━━━━━━━━━\n"
+                f"🔄 <i>Next Attack in 5s...</i>"
+            )
+            bot.send_message(message.chat.id, result_text, parse_mode="HTML")
+        
+        time.sleep(5) # Delay before next cycle
 
 if __name__ == "__main__":
     keep_alive()
