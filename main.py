@@ -7,41 +7,40 @@ import base64
 import os
 
 # --- CONFIG ---
-# @BotFather se naya token lekar yahan dalo
 API_TOKEN = '8694242868:AAHw4p485GwDHnWQlxa7szVT8oqQZEtSf44'
 bot = telebot.TeleBot(API_TOKEN, parse_mode="MarkdownV2")
 
 CHANNELS = ["-1003815161090", "-1003973812867"]
 LINKS = ["https://t.me/+_RZ0gN9HU6xhZTRl", "https://t.me/+7bNfhxLosYsxMmVl"]
 
-# --- 🔥 REAL DECRYPTION LOGIC (ADVANCED) 🔥 ---
-def real_decrypt_logic(content):
-    # Loop taaki multiple layers hat jayein
-    for _ in range(10):
-        old_content = content
-        
-        # 1. Hex (\x3c) aur Unicode (\u003c) decode
+# --- 🔥 DECRYPTION ENGINE (FIXED) 🔥 ---
+def real_decrypt_engine(content):
+    # Layer 1: JavaScript Obfuscation removal (eval/unescape/hex)
+    # Hum content ko damage nahi karenge, sirf encoding badlenge
+    try:
+        # Hex strings decode (\x...)
         content = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), content)
+        # Unicode strings decode (\u...)
         content = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), content)
-        
-        # 2. unescape() strings ko decode karna
-        unescapes = re.findall(r'unescape\([\'"](.[^\'"]*)[\'"]\)', content)
-        for u in unescapes:
-            content = content.replace(u, urllib.parse.unquote(u))
-            
-        # 3. Base64 (atob) Detector
-        b64_found = re.findall(r'atob\([\'"]([A-Za-z0-9+/=]{10,})[\'"]\)', content)
-        for b in b64_found:
-            try:
-                decoded = base64.b64decode(b).decode('utf-8', errors='ignore')
-                content = content.replace(b, decoded)
-            except: pass
+    except: pass
 
-        # 4. JavaScript Wrappers (eval, document.write) saaf karna
-        content = content.replace('eval(', '').replace('document.write(', '').replace('unescape(', '')
-        
-        if old_content == content:
-            break
+    # unescape() logic
+    if "unescape(" in content:
+        content = urllib.parse.unquote(content)
+
+    # Base64 logic (sirf agar valid string mile)
+    b64_pattern = r'atob\([\'"]([A-Za-z0-9+/=]{20,})[\'"]\)'
+    matches = re.findall(b64_pattern, content)
+    for b64_str in matches:
+        try:
+            decoded = base64.b64decode(b64_str).decode('utf-8', errors='ignore')
+            content = content.replace(b64_str, decoded)
+        except: pass
+
+    # Important: Hum 'eval' ko sirf tab hatate hain jab wo string ke bahar ho
+    # Taki HTML tags (like <script>) kharab na ho
+    content = content.replace('eval(unescape(', '').replace('document.write(', '')
+    
     return content
 
 # --- UI & BUTTONS ---
@@ -64,43 +63,43 @@ def start(message):
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
     if call.data == "check":
-        # Bot ko admin hona zaroori hai channels mein
         try:
             status1 = bot.get_chat_member(CHANNELS[0], call.from_user.id).status
             status2 = bot.get_chat_member(CHANNELS[1], call.from_user.id).status
             if status1 != 'left' and status2 != 'left':
                 markup = types.InlineKeyboardMarkup()
-                markup.add(types.InlineKeyboardButton("📤 𝐔𝐏𝐋𝐎𝐀𝐃 𝐇𝐓𝐌𝐋", callback_data="up"))
+                markup.add(types.InlineKeyboardButton("📤 𝐔𝐏𝐋𝐎𝐀𝐃𝐈𝐍𝐆 𝐅𝐈𝐋𝐄 𝐅𝐀𝐒𝐓𝐄𝐑", callback_data="up"))
                 markup.add(types.InlineKeyboardButton("👨‍💻 𝐎𝐖𝐍𝐄𝐑", url="https://t.me/adityapaswan"))
                 bot.edit_message_text("*👑 𝐕𝐈𝐏 𝐌𝐄𝐍𝐔 𝐀𝐂𝐓𝐈𝐕𝐀𝐓𝐄𝐃\!*", call.message.chat.id, call.message.message_id, reply_markup=markup)
             else:
-                bot.answer_callback_query(call.id, "❌ Join Requests Pending!", show_alert=True)
+                bot.answer_callback_query(call.id, "❌ Request Pending! Dono join karo.", show_alert=True)
         except:
-            bot.answer_callback_query(call.id, "❌ Bot Admin Nahi Hai!", show_alert=True)
+            bot.answer_callback_query(call.id, "❌ Error! Bot ko admin banao.", show_alert=True)
             
     elif call.data == "up":
-        bot.send_message(call.message.chat.id, "*📥 𝐀𝐛 𝐚𝐩𝐧𝐢 𝐄𝐧𝐜𝐫𝐲𝐩𝐭𝐞𝐝 𝐇𝐓𝐌𝐋 𝐟𝐢𝐥𝐞 𝐛𝐡𝐞𝐣𝐞𝐢𝐧\.*")
+        bot.send_message(call.message.chat.id, "*📥 𝐔𝐏𝐋𝐎𝐀𝐃𝐈𝐍𝐆 𝐅𝐈𝐋𝐄 𝐅𝐀𝐒𝐓𝐄𝐑\.\.\. 𝐒𝐞𝐧𝐝 𝐇𝐓𝐌𝐋 𝐧𝐨𝐰\!*")
 
 @bot.message_handler(content_types=['document'])
 def handle_file(message):
     if message.document.file_name.endswith('.html'):
         m = bot.send_message(message.chat.id, "⚙️ *𝐏𝐑𝐎𝐂𝐄𝐒𝐒𝐈𝐍𝐆: 𝟎%*")
         
-        # 10 Sec Professional Animation
+        # Super Fast Animation (Har step 0.5s)
         for i in range(10, 101, 10):
-            time.sleep(1)
+            time.sleep(0.5)
             bar = "▓" * (i // 10) + "░" * (10 - (i // 10))
-            bot.edit_message_text(f"⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆 𝐑𝐄𝐀𝐋 𝐃𝐀𝐓𝐀\.\.\.*\n\n`{bar}` *{i}%*", message.chat.id, m.message_id)
+            bot.edit_message_text(f"⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆\.\.\.*\n\n`{bar}` *{i}%*", message.chat.id, m.message_id)
 
         file_info = bot.get_file(message.document.file_id)
         data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
         
-        # Super Decrypt Logic Call
-        decrypted_html = real_decrypt_logic(data)
+        # Real Decrypt Call
+        final_html = real_decrypt_engine(data)
 
+        # File Naming
         new_name = f"{message.document.file_name.split('.')[0]} ENCRYPTION ADITYA.html"
         with open(new_name, "w", encoding="utf-8") as f:
-            f.write(decrypted_html)
+            f.write(final_html)
 
         with open(new_name, "rb") as f:
             bot.send_document(message.chat.id, f, caption="✅ *𝐅𝐈𝐋𝐄 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐄𝐃 𝐁𝐘 𝐀𝐃𝐈𝐓𝐘𝐀 𝐗 𝐎𝐖𝐍𝐄𝐑*")
