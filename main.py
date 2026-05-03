@@ -1,5 +1,6 @@
 import telebot
 from telebot import types
+import time
 import re
 import urllib.parse
 import base64
@@ -9,47 +10,38 @@ import os
 API_TOKEN = '8694242868:AAHw4p485GwDHnWQlxa7szVT8oqQZEtSf44'
 bot = telebot.TeleBot(API_TOKEN, parse_mode="MarkdownV2")
 
-# ASLI TERE LINKS (NO CHANGES)
-CHANNELS = ["-1003815161090", "-1003973812867"]
-LINKS = ["https://t.me/+_RZ0gN9HU6xhZTRl", "https://t.me/+7bNfhxLosYsxMmVl"]
 OWNER_LINK = "https://t.me/ADITYAXVIPBOT"
+MY_CHANNEL = "https://t.me/+_yHnY4cQrzY5MjA9" # Aapka Channel Link
 
-# --- 🔥 DEEP SOURCE UNPACKER (UI SAFE) 🔥 ---
-def final_stable_decrypt(content):
-    # Loop for deep obfuscation layers
-    for _ in range(15):
+# --- 🔥 PRO DECRYPTION & RE-DESIGN ENGINE 🔥 ---
+def ultimate_vip_decrypt(content):
+    # Loop for deep layers
+    for _ in range(10):
         old_content = content
-        
-        # 1. Base64/atob extraction without breaking UI tags
-        b64_pattern = r'atob\s*\(\s*[\'"]([A-Za-z0-9+/=]{20,})[\'"]\s*\)'
-        for b64 in re.findall(b64_pattern, content):
+        # Base64 Scanner
+        b64_matches = re.findall(r'[A-Za-z0-9+/]{40,}(?:={0,2})', content)
+        for b64 in b64_matches:
             try:
                 decoded = base64.b64decode(b64).decode('utf-8', errors='ignore')
-                # Replace content only, keep the surrounding code logic
-                content = content.replace(f'atob("{b64}")', f'"{decoded}"')
-                content = content.replace(f"atob('{b64}')", f"'{decoded}'")
+                if len(decoded) > 10: content = content.replace(b64, decoded)
             except: pass
-
-        # 2. Hex (\x) & Unicode (\u) cleaner
+        # Hex/Unicode/Unescape
         content = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), content)
         content = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), content)
-        
-        # 3. Fast URL Decode
-        if "%" in content:
-            content = urllib.parse.unquote(content)
-
+        content = urllib.parse.unquote(content)
         if old_content == content: break
-            
-    # CRITICAL: Strip eval/unescape but keep the HTML/CSS tags intact
-    content = content.replace('eval(unescape(', '').replace('eval(', '').replace('document.write(', '')
+
+    # Yahan hum asli HTML structure restore kar rahe hain (VIP Look)
+    # Taki kachra saaf ho aur interface sahi dikhe
+    content = content.replace('eval(', '').replace('document.write(', '')
+    
     return content
 
-# --- UI & HANDLERS ---
+# --- UI LOGIC ---
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("✨ 𝐉𝐎𝐈𝐍 𝐂𝐇𝐀𝐍𝐍𝐄𝐋 𝟏", url=LINKS[0]))
-    markup.add(types.InlineKeyboardButton("✨ 𝐉𝐎𝐈𝐍 𝐂𝐇𝐀𝐍𝐍𝐄𝐋 𝟐", url=LINKS[1]))
+    markup.add(types.InlineKeyboardButton("✨ 𝐉𝐎𝐈𝐍 𝐂𝐇𝐀𝐍𝐍𝐄𝐋", url=MY_CHANNEL))
     markup.add(types.InlineKeyboardButton("🔄 𝐂𝐇𝐄𝐂𝐊 𝐀𝐏𝐏𝐑𝐎𝐕𝐀𝐋", callback_data="check"))
     
     bot.send_message(message.chat.id, f"""
@@ -58,48 +50,50 @@ def start(message):
 *╚══════════════════════╝*
 
 *⚠️ 𝐀𝐜𝐜𝐞𝐬𝐬 𝐃𝐞𝐧𝐢𝐞𝐝\! 𝐏𝐥𝐞𝐚𝐬𝐞 𝐉𝐨𝐢𝐧*
-*𝐁𝐨𝐭𝐡 𝐂𝐡𝐚𝐧𝐧𝐞𝐥𝐬 𝐁𝐞𝐥𝐨𝐰 𝐓𝐨 𝐔𝐬𝐞\.*
+*𝐎𝐮𝐫 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐂𝐡𝐚𝐧𝐧𝐞𝐥 𝐁𝐞𝐥𝐨𝐰\.*
 """, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
     if call.data == "check":
         markup = types.InlineKeyboardMarkup()
-        markup.add(types.InlineKeyboardButton("📤 𝐔𝐏𝐋𝐎𝐀𝐃 𝐇𝐓𝐌𝐋", callback_data="up"))
+        markup.add(types.InlineKeyboardButton("📤 𝐔𝐏𝐋𝐎𝐀𝐃𝐈𝐍𝐆 𝐅𝐈𝐋𝐄 𝐅𝐀𝐒𝐓𝐄𝐑", callback_data="up"))
         markup.add(types.InlineKeyboardButton("👨‍💻 𝐎𝐖𝐍𝐄𝐑", url=OWNER_LINK))
-        bot.edit_message_text("*👑 𝐕𝐈𝐏 𝐌𝐄𝐍𝐔 𝐀𝐂𝐓𝐈𝐕𝐀𝐓𝐄𝐃\!*", call.message.chat.id, call.message.message_id, reply_markup=markup)
+        bot.edit_message_text("*👑 𝐕𝐈𝐏 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐎𝐑 𝐀𝐂𝐓𝐈𝐕𝐀𝐓𝐄𝐃\!*", call.message.chat.id, call.message.message_id, reply_markup=markup)
             
     elif call.data == "up":
-        bot.send_message(call.message.chat.id, "*📥 𝐒𝐞𝐧𝐝 𝐘𝐨𝐮 r 𝐄𝐧𝐜𝐫𝐲𝐩𝐭𝐞𝐝 𝐇𝐓𝐌𝐋 𝐍𝐨𝐰\!*")
+        bot.send_message(call.message.chat.id, "*📥 𝐔𝐏𝐋𝐎𝐀𝐃𝐈𝐍𝐆 𝐅𝐈𝐋𝐄 𝐅𝐀𝐒𝐓𝐄𝐑\.\.\. 𝐒𝐞𝐧𝐝 𝐇𝐓𝐌𝐋\!*")
 
 @bot.message_handler(content_types=['document'])
 def handle_file(message):
     if message.document.file_name.endswith('.html'):
-        m = bot.send_message(message.chat.id, "⚡ *𝐈𝐍𝐒𝐓𝐀𝐍𝐓 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆\.\.\.*")
+        m = bot.send_message(message.chat.id, "⚙️ *𝐏𝐑𝐎𝐂𝐄𝐒𝐒𝐈𝐍𝐆: 𝟎%*")
         
-        try:
-            file_info = bot.get_file(message.document.file_id)
-            data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
-            
-            # Super Fast Decrypt
-            final_html = final_stable_decrypt(data)
+        # Fast Animation
+        for i in range(10, 101, 20):
+            time.sleep(0.2) 
+            bot.edit_message_text(f"⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆 𝐕𝐈𝐏\.\.\.* `{i}%`", message.chat.id, m.message_id)
 
-            caption_text = f"""
-👑 *𝐇𝐓𝐌𝐋 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐎𝐍 𝐃𝐎𝐍𝐄* ✅
+        file_info = bot.get_file(message.document.file_id)
+        data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
+        
+        # Real Logic Call
+        final_html = ultimate_vip_decrypt(data)
 
-🔐 *𝐂𝐡𝐚𝐧𝐧 e𝐥 𝟏:* {LINKS[0]}
-🔐 *𝐂𝐡𝐚𝐧𝐧 e𝐥 𝟐:* {LINKS[1]}
+        # Aapka branding aur link add karna
+        caption_text = f"""
+👑 *𝐇𝐓𝐌𝐋 𝐄𝐍𝐂𝐑𝐘𝐏𝐓𝐈𝐎𝐍 𝐃𝐎𝐍𝐄* ✅
+
+🔐 *𝐂𝐡𝐚𝐧𝐧𝐞𝐥:* {MY_CHANNEL}
 """
-            new_name = f"DECRYPTED_{message.document.file_name}"
-            with open(new_name, "w", encoding="utf-8") as f:
-                f.write(final_html)
+        new_name = f"{message.document.file_name.split('.')[0]} ENCRYPTION ADITYA.html"
+        with open(new_name, "w", encoding="utf-8") as f:
+            f.write(final_html)
 
-            with open(new_name, "rb") as f:
-                bot.send_document(message.chat.id, f, caption=caption_text)
-            
-            bot.delete_message(message.chat.id, m.message_id)
-            os.remove(new_name)
-        except Exception as e:
-            bot.edit_message_text(f"❌ Error: {str(e)}", message.chat.id, m.message_id)
+        with open(new_name, "rb") as f:
+            bot.send_document(message.chat.id, f, caption=caption_text)
+        
+        bot.delete_message(message.chat.id, m.message_id)
+        os.remove(new_name)
 
 bot.infinity_polling()
