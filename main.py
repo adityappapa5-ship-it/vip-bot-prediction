@@ -10,45 +10,52 @@ import time
 API_TOKEN = '8694242868:AAHw4p485GwDHnWQlxa7szVT8oqQZEtSf44'
 bot = telebot.TeleBot(API_TOKEN)
 
-# ASLI LINKS
+# TERE ASLI LINKS
 LINKS = ["https://t.me/+_RZ0gN9HU6xhZTRl", "https://t.me/+7bNfhxLosYsxMmVl"]
 OWNER_LINK = "https://t.me/ADITYAXVIPBOT"
 
-# --- 🔥 HEAVY DECRYPTION ENGINE (FIXED) 🔥 ---
-def heavy_decrypt(content):
-    # Step 1: Extract hidden blocks from garbage
-    # Ye wo "CjzxdH..." wale kachre ko dhoondh kar saaf karta hai
-    for _ in range(30):
-        old_content = content
+# --- 🔥 ULTRA DEEP DECRYPTION (UI SAFE) 🔥 ---
+def ultra_deep_decrypt(content):
+    # Aapka Credit Link jo top pe jayega
+    header_credit = f"\n"
+    
+    # Deep cleaning loop
+    for _ in range(40):
+        old_data = content
         
-        # Base64 Pattern matching
-        b64_regex = r'[A-Za-z0-9+/]{50,}' 
-        matches = re.findall(b64_regex, content)
-        for block in matches:
+        # 1. Base64 Multi-Layer Extract
+        b64_regex = r'[A-Za-z0-9+/]{40,}'
+        for block in re.findall(b64_regex, content):
             try:
                 decoded = base64.b64decode(block).decode('utf-8', errors='ignore')
-                if "<" in decoded or "var" in decoded: # Check if it's real code
+                if any(x in decoded for x in ["<", "var", "function", "div"]):
                     content = content.replace(block, decoded)
             except: pass
 
-        # Step 2: Hex & Unicode Clean
+        # 2. Hex & Unicode Fix
         content = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), content)
         content = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), content)
         
-        # Step 3: Remove Protections
-        content = content.replace('eval(unescape(', '').replace('eval(', '').replace('document.write(', '')
+        # 3. URL Unescape
+        if "%" in content:
+            content = urllib.parse.unquote(content)
 
-        if old_content == content: break
-    return content
+        if old_data == content: break
 
-# --- 📥 FILE HANDLER (WITH 1-100% EFFECT) ---
+    # UI Cleanup: Sirf protection wrappers hatana, design nahi
+    content = content.replace('eval(unescape(', '').replace('eval(', '').replace('document.write(', '')
+    
+    return header_credit + content
+
+# --- 📥 FILE HANDLER ---
 @bot.message_handler(content_types=['document'])
 def handle_docs(message):
     if message.document.file_name.lower().endswith('.html'):
-        # Loading Effect
+        # 1 to 100 Tik-Tik Effect
         m = bot.reply_to(message, "┌──────────────────────┐\n   🚀 DECRYPTING: 1%\n└──────────────────────┘")
         
-        for p in [20, 50, 80, 100]:
+        steps = [30, 65, 90, 100]
+        for p in steps:
             time.sleep(0.3)
             bot.edit_message_text(f"┌──────────────────────┐\n   🚀 DECRYPTING: {p}%\n└──────────────────────┘", message.chat.id, m.message_id)
 
@@ -56,16 +63,15 @@ def handle_docs(message):
             file_info = bot.get_file(message.document.file_id)
             data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
             
-            # Asli Decryption Logic
-            final_code = heavy_decrypt(data)
+            # Execute Final Logic
+            final_code = ultra_deep_decrypt(data)
 
-            # Save File
+            # Save and Send
             new_file = f"DECRYPTED_{message.document.file_name}"
             with open(new_file, "w", encoding="utf-8") as f:
                 f.write(final_code)
                 
             with open(new_file, "rb") as f:
-                # Clean Block Caption
                 cap = (
                     "┌──────────────────────┐\n"
                     "   👑 HTML DECRYPTION DONE ✅\n"
@@ -109,10 +115,11 @@ def callback_handler(call):
             "┌──────────────────────┐\n"
             "   👑 VIP MENU ACTIVATED\n"
             "└──────────────────────┘\n\n"
-            "System is Ready. Send File Now."
+            "System Ready. Send Your HTML File Now."
         )
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id, reply_markup=markup)
     elif call.data == "up":
         bot.send_message(call.message.chat.id, "🔮 PLEASE SEND YOUR HTML FILE")
 
 bot.infinity_polling()
+                     
