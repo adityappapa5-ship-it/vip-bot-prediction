@@ -1,8 +1,8 @@
 import telebot
 from telebot import types
 import re
-import urllib.parse
 import base64
+import urllib.parse
 import os
 import time
 
@@ -10,68 +10,62 @@ import time
 API_TOKEN = '8694242868:AAHw4p485GwDHnWQlxa7szVT8oqQZEtSf44'
 bot = telebot.TeleBot(API_TOKEN)
 
-# TERE ASLI LINKS
+# ASLI LINKS
 LINKS = ["https://t.me/+_RZ0gN9HU6xhZTRl", "https://t.me/+7bNfhxLosYsxMmVl"]
 OWNER_LINK = "https://t.me/ADITYAXVIPBOT"
 
-# --- 🔥 DEEP RECURSIVE DECRYPTION ENGINE 🔥 ---
-def deep_decrypt(content):
-    # 50 baar andar tak scan karega har layer ko todne ke liye
-    for _ in range(50):
+# --- 🔥 HEAVY DECRYPTION ENGINE (FIXED) 🔥 ---
+def heavy_decrypt(content):
+    # Step 1: Extract hidden blocks from garbage
+    # Ye wo "CjzxdH..." wale kachre ko dhoondh kar saaf karta hai
+    for _ in range(30):
         old_content = content
         
-        # 1. Base64 Unpacking (atob strings)
-        # Isme design safe rehta hai, sirf logic unlock hota hai
-        b64_pattern = r'atob\s*\(\s*[\'"]([A-Za-z0-9+/=]{15,})[\'"]\s*\)'
-        matches = re.findall(b64_pattern, content)
-        for b64 in matches:
+        # Base64 Pattern matching
+        b64_regex = r'[A-Za-z0-9+/]{50,}' 
+        matches = re.findall(b64_regex, content)
+        for block in matches:
             try:
-                decoded = base64.b64decode(b64).decode('utf-8', errors='ignore')
-                content = content.replace(f'atob("{b64}")', f'"{decoded}"')
-                content = content.replace(f"atob('{b64}')", f"'{decoded}'")
+                decoded = base64.b64decode(block).decode('utf-8', errors='ignore')
+                if "<" in decoded or "var" in decoded: # Check if it's real code
+                    content = content.replace(block, decoded)
             except: pass
 
-        # 2. Hex (\x) aur Unicode (\u) Decoding
+        # Step 2: Hex & Unicode Clean
         content = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), content)
         content = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), content)
         
-        # 3. URL Unescape (Old Encryption fix)
-        if "%" in content:
-            content = urllib.parse.unquote(content)
+        # Step 3: Remove Protections
+        content = content.replace('eval(unescape(', '').replace('eval(', '').replace('document.write(', '')
 
-        # Agar is loop mein kuch badla nahi, matlab file poori decrypt ho chuki hai
-        if old_content == content:
-            break
-            
-    # Asli HTML structure ko restore karna bina UI bigade
-    content = content.replace('eval(unescape(', '').replace('eval(', '').replace('document.write(', '')
+        if old_content == content: break
     return content
 
-# --- 📥 FILE HANDLER ---
+# --- 📥 FILE HANDLER (WITH 1-100% EFFECT) ---
 @bot.message_handler(content_types=['document'])
 def handle_docs(message):
     if message.document.file_name.lower().endswith('.html'):
-        # 1 se 100 tak Loading Effect (Tera favorite)
-        m = bot.reply_to(message, "┌──────────────────────┐\n   🚀 SYSTEM STARTING: 1%\n└──────────────────────┘")
+        # Loading Effect
+        m = bot.reply_to(message, "┌──────────────────────┐\n   🚀 DECRYPTING: 1%\n└──────────────────────┘")
         
-        for p in [20, 45, 75, 100]:
-            time.sleep(0.4)
+        for p in [20, 50, 80, 100]:
+            time.sleep(0.3)
             bot.edit_message_text(f"┌──────────────────────┐\n   🚀 DECRYPTING: {p}%\n└──────────────────────┘", message.chat.id, m.message_id)
 
         try:
             file_info = bot.get_file(message.document.file_id)
             data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
             
-            # Deep Logic Chalao
-            final_code = deep_decrypt(data)
+            # Asli Decryption Logic
+            final_code = heavy_decrypt(data)
 
-            # File save karo
-            new_name = f"DECRYPTED_{message.document.file_name}"
-            with open(new_name, "w", encoding="utf-8") as f:
+            # Save File
+            new_file = f"DECRYPTED_{message.document.file_name}"
+            with open(new_file, "w", encoding="utf-8") as f:
                 f.write(final_code)
                 
-            with open(new_name, "rb") as f:
-                # Tera Manga Hua Block Style Caption
+            with open(new_file, "rb") as f:
+                # Clean Block Caption
                 cap = (
                     "┌──────────────────────┐\n"
                     "   👑 HTML DECRYPTION DONE ✅\n"
@@ -84,13 +78,11 @@ def handle_docs(message):
                 bot.send_document(message.chat.id, f, caption=cap)
             
             bot.delete_message(message.chat.id, m.message_id)
-            os.remove(new_name)
+            os.remove(new_file)
         except Exception as e:
             bot.edit_message_text(f"❌ ERROR: {str(e)}", message.chat.id, m.message_id)
-    else:
-        bot.reply_to(message, "❌ BHAI SIRF HTML FILE BHEJEIN!")
 
-# --- START MENU ---
+# --- START & MENU ---
 @bot.message_handler(commands=['start'])
 def welcome(message):
     markup = types.InlineKeyboardMarkup()
@@ -102,7 +94,7 @@ def welcome(message):
         "┌──────────────────────┐\n"
         "      👑 ADITYA X OWNER\n"
         "└──────────────────────┘\n\n"
-        "⚠️ Access Denied! Dono channels join karein tabhi system kaam karega."
+        "⚠️ Access Denied! Please Join Both Channels."
     )
     bot.send_message(message.chat.id, msg, reply_markup=markup)
 
@@ -117,10 +109,10 @@ def callback_handler(call):
             "┌──────────────────────┐\n"
             "   👑 VIP MENU ACTIVATED\n"
             "└──────────────────────┘\n\n"
-            "Ab aap file bhej sakte hain."
+            "System is Ready. Send File Now."
         )
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id, reply_markup=markup)
     elif call.data == "up":
-        bot.send_message(call.message.chat.id, "🔮 PLEASE SEND YOUR HTML DECRYPT BOT")
+        bot.send_message(call.message.chat.id, "🔮 PLEASE SEND YOUR HTML FILE")
 
 bot.infinity_polling()
