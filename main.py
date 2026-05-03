@@ -9,39 +9,36 @@ import os
 API_TOKEN = '8694242868:AAHw4p485GwDHnWQlxa7szVT8oqQZEtSf44'
 bot = telebot.TeleBot(API_TOKEN, parse_mode="MarkdownV2")
 
-# TERE DONO CHANNELS (FIXED)
+# TERE ASLI LINKS (AB KOI GALTI NAHI)
 CHANNELS = ["-1003815161090", "-1003973812867"]
 LINKS = ["https://t.me/+_RZ0gN9HU6xhZTRl", "https://t.me/+7bNfhxLosYsxMmVl"]
 OWNER_LINK = "https://t.me/ADITYAXVIPBOT"
 
-# --- 🔥 ULTRA FAST HD DECRYPTION ENGINE 🔥 ---
-def ultra_fast_decrypt(content):
-    # Ye logic sirf script ke andar ka data nikalega, UI/Design ko touch nahi karega
-    for _ in range(20): # Deep layers ke liye 20 baar scan
-        old_content = content
+# --- 🔥 INSTANT UNPACKER (UI PRESERVED) 🔥 ---
+def instant_unlocker(content):
+    # Deep scan for multi-layer encryption
+    for _ in range(15):
+        old = content
         
-        # 1. Base64/atob Unpacker (No Design Change)
+        # 1. Base64 (atob) ko dhoondh kar seedha script mein badalna
         b64_pattern = r'atob\s*\(\s*[\'"]([A-Za-z0-9+/=]{20,})[\'"]\s*\)'
-        matches = re.findall(b64_pattern, content)
-        for b64 in matches:
+        for b64 in re.findall(b64_pattern, content):
             try:
                 decoded = base64.b64decode(b64).decode('utf-8', errors='ignore')
-                # Original content ko wahi replace karega bina tags tode
-                content = content.replace(f"atob('{b64}')", f"`{decoded}`")
-                content = content.replace(f'atob("{b64}")', f'`{decoded}`')
+                # Invisible replace: design ko touch nahi karega
+                content = content.replace(f"atob('{b64}')", f"'{decoded}'")
+                content = content.replace(f'atob("{b64}")', f'"{decoded}"')
             except: pass
 
-        # 2. Hex (\x) & Unicode (\u) Decode
+        # 2. Hex/Unicode fix without breaking CSS/HTML
         content = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), content)
         content = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), content)
-        
-        # 3. URL Unescape
         content = urllib.parse.unquote(content)
 
-        if old_content == content: break
+        if old == content: break
             
-    # Sirf execution wrappers hatayenge taaki UI chalta rahe
-    content = content.replace('eval(unescape(', '').replace('eval(', '')
+    # Sirf execution wrappers hatana hai, pure tags nahi
+    content = content.replace('eval(unescape(', '').replace('eval(', '').replace('document.write(', '')
     return content
 
 # --- UI HANDLERS ---
@@ -75,19 +72,17 @@ def handle_query(call):
 @bot.message_handler(content_types=['document'])
 def handle_file(message):
     if message.document.file_name.endswith('.html'):
-        # Instant Processing Message
-        m = bot.send_message(message.chat.id, "⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆: 𝟏𝟎𝟎%*")
+        # Turant start hone wala message
+        m = bot.send_message(message.chat.id, "⚡ *𝐈𝐍𝐒𝐓𝐀𝐍𝐓 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆\.\.\.*")
         
         file_info = bot.get_file(message.document.file_id)
         data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
         
-        # Super Fast Decrypt (UI Safe)
-        final_html = ultra_fast_decrypt(data)
+        # Real Logic (Bina UI bigade)
+        final_html = instant_unlocker(data)
 
         caption_text = f"""
 👑 *𝐇𝐓𝐌𝐋 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐎𝐍 𝐃𝐎𝐍𝐄* ✅
-
-📱 *𝐏𝐇𝐎𝐍𝐄 𝐍𝐔𝐌𝐁𝐄𝐑 𝐄𝐗𝐓𝐑𝐀𝐂𝐓𝐄𝐃*
 
 🔐 *𝐂𝐡𝐚𝐧𝐧𝐞𝐥 𝟏:* {LINKS[0]}
 🔐 *𝐂𝐡𝐚𝐧𝐧𝐞𝐥 𝟐:* {LINKS[1]}
