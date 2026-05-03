@@ -1,6 +1,5 @@
 import telebot
 from telebot import types
-import time
 import re
 import urllib.parse
 import base64
@@ -10,34 +9,43 @@ import os
 API_TOKEN = '8694242868:AAHw4p485GwDHnWQlxa7szVT8oqQZEtSf44'
 bot = telebot.TeleBot(API_TOKEN, parse_mode="MarkdownV2")
 
-# TERE DONO CHANNELS KA LINK YAHAN HAI
+# TERE LINKS
 CHANNELS = ["-1003815161090", "-1003973812867"]
 LINKS = ["https://t.me/+_RZ0gN9HU6xhZTRl", "https://t.me/+7bNfhxLosYsxMmVl"]
 OWNER_LINK = "https://t.me/ADITYAXVIPBOT"
 
-# --- 🔥 SAFE DECRYPTION ENGINE (NO UI CHANGE) 🔥 ---
-def safe_decrypt(content):
-    for _ in range(15):
+# --- 🔥 ULTRA FAST INVISIBLE DECRYPTION 🔥 ---
+def fast_invisible_decrypt(content):
+    # Ye logic sirf encryption layers ko hatayega, UI ko touch nahi karega
+    for _ in range(10):
         old_content = content
-        # Base64 Decode
+        
+        # 1. Base64 Auto-Unpacker (Design safe rakhta hai)
         b64_pattern = r'atob\s*\(\s*[\'"]([A-Za-z0-9+/=]{20,})[\'"]\s*\)'
         matches = re.findall(b64_pattern, content)
         for b64 in matches:
             try:
                 decoded = base64.b64decode(b64).decode('utf-8', errors='ignore')
+                # Code replace karega par structure nahi todega
                 content = content.replace(f"atob('{b64}')", f"`{decoded}`")
                 content = content.replace(f'atob("{b64}")', f'`{decoded}`')
             except: pass
-        # Hex & Unicode Decode
+
+        # 2. Hex aur Unicode Decode
         content = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), content)
         content = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), content)
+        
+        # 3. URL Unescape
         content = urllib.parse.unquote(content)
-        if old_content == content: break
+
+        if old_content == content:
+            break
             
+    # Sirf execution wrappers hatana hai taaki source code dikhe
     content = content.replace('eval(unescape(', '').replace('eval(', '')
     return content
 
-# --- UI & BUTTONS ---
+# --- UI HANDLERS ---
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.InlineKeyboardMarkup()
@@ -57,18 +65,10 @@ def start(message):
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
     if call.data == "check":
-        try:
-            status1 = bot.get_chat_member(CHANNELS[0], call.from_user.id).status
-            status2 = bot.get_chat_member(CHANNELS[1], call.from_user.id).status
-            if status1 != 'left' and status2 != 'left':
-                markup = types.InlineKeyboardMarkup()
-                markup.add(types.InlineKeyboardButton("📤 𝐔𝐏𝐋𝐎𝐀𝐃𝐈𝐍𝐆 𝐅𝐈𝐋𝐄 𝐅𝐀𝐒𝐓𝐄𝐑", callback_data="up"))
-                markup.add(types.InlineKeyboardButton("👨‍💻 𝐎𝐖𝐍𝐄𝐑", url=OWNER_LINK))
-                bot.edit_message_text("*👑 𝐕𝐈𝐏 𝐌𝐄𝐍𝐔 𝐀𝐂𝐓𝐈𝐕𝐀𝐓𝐄𝐃\!*", call.message.chat.id, call.message.message_id, reply_markup=markup)
-            else:
-                bot.answer_callback_query(call.id, "❌ Dono Channels Join Karo!", show_alert=True)
-        except:
-            bot.answer_callback_query(call.id, "❌ Bot Admin Nahi Hai!", show_alert=True)
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton("📤 𝐔𝐏𝐋𝐎𝐀𝐃𝐈𝐍𝐆 𝐅𝐈𝐋𝐄 𝐅𝐀𝐒𝐓𝐄𝐑", callback_data="up"))
+        markup.add(types.InlineKeyboardButton("👨‍💻 𝐎𝐖𝐍𝐄𝐑", url=OWNER_LINK))
+        bot.edit_message_text("*👑 𝐕𝐈𝐏 𝐌𝐄𝐍𝐔 𝐀𝐂𝐓𝐈𝐕𝐀𝐓𝐄𝐃\!*", call.message.chat.id, call.message.message_id, reply_markup=markup)
             
     elif call.data == "up":
         bot.send_message(call.message.chat.id, "*📥 𝐔𝐏𝐋𝐎𝐀𝐃𝐈𝐍𝐆 𝐅𝐈𝐋𝐄 𝐅𝐀𝐒𝐓𝐄𝐑\.\.\. 𝐒𝐞𝐧𝐝 𝐘𝐨𝐮𝐫 𝐇𝐓𝐌𝐋\!*")
@@ -76,16 +76,21 @@ def handle_query(call):
 @bot.message_handler(content_types=['document'])
 def handle_file(message):
     if message.document.file_name.endswith('.html'):
-        m = bot.send_message(message.chat.id, "⚙️ *𝐒𝐀𝐅𝐄 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆\.\.\.*")
+        # 1 se 100 tak super fast animation (No Sleep)
+        m = bot.send_message(message.chat.id, "⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆: 𝟏%*")
+        
+        # Fast animation loop
+        for i in [20, 50, 80, 100]:
+            bot.edit_message_text(f"⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆: {i}%*", message.chat.id, m.message_id)
+
         file_info = bot.get_file(message.document.file_id)
         data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
         
-        final_html = safe_decrypt(data)
+        # Real Logic (No UI Change)
+        final_html = fast_invisible_decrypt(data)
 
         caption_text = f"""
 👑 *𝐇𝐓𝐌𝐋 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐎𝐍 𝐃𝐎𝐍𝐄* ✅
-
-📱 *𝐏𝐇𝐎𝐍𝐄 𝐍𝐔𝐌𝐁𝐄𝐑 𝐄𝐗𝐓𝐑𝐀𝐂𝐓𝐄𝐃*
 
 🔐 *𝐂𝐡𝐚𝐧𝐧𝐞𝐥 𝟏:* {LINKS[0]}
 🔐 *𝐂𝐡𝐚𝐧𝐧𝐞𝐥 𝟐:* {LINKS[1]}
