@@ -4,22 +4,23 @@ import re
 import urllib.parse
 import base64
 import os
+import time
 
 # --- CONFIG ---
 API_TOKEN = '8694242868:AAHw4p485GwDHnWQlxa7szVT8oqQZEtSf44'
 bot = telebot.TeleBot(API_TOKEN)
 
-# ASLI TERE LINKS
+# TERE ASLI LINKS
 LINKS = ["https://t.me/+_RZ0gN9HU6xhZTRl", "https://t.me/+7bNfhxLosYsxMmVl"]
 OWNER_LINK = "https://t.me/ADITYAXVIPBOT"
 
-# --- 🔥 ULTIMATE SOURCE UNPACKER (UI SAFE) 🔥 ---
-def ultimate_unpacker(content):
-    # Deep layer loop to crack complex encryption
-    for _ in range(25):
+# --- 🔥 MASTER DECRYPTION ENGINE (OLD & NEW FIX) 🔥 ---
+def master_decrypt(content):
+    # Deep layer unpacking logic
+    for _ in range(30): # 30 baar deep scan har layer ke liye
         old_data = content
         
-        # 1. Base64/atob Crack (Invisible replacement)
+        # 1. Base64 & atob Unpacker
         b64_matches = re.findall(r'atob\s*\(\s*[\'"]([A-Za-z0-9+/=]{20,})[\'"]\s*\)', content)
         for b64 in b64_matches:
             try:
@@ -27,17 +28,17 @@ def ultimate_unpacker(content):
                 content = content.replace(f'atob("{b64}")', f'"{decoded}"').replace(f"atob('{b64}')", f"'{decoded}'")
             except: pass
 
-        # 2. Hex (\x) & Unicode (\u) Raw Fix
+        # 2. Hex (\x) & Unicode (\u) Clean
         content = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), content)
         content = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), content)
         
-        # 3. URL Component Fix
+        # 3. Old Encryption URL Decode
         if "%" in content:
             content = urllib.parse.unquote(content)
 
         if old_data == content: break
 
-    # Logic extraction (Bina UI bigade)
+    # UI PRESERVATION: Sirf wrappers hatana hai, design nahi
     content = content.replace('eval(unescape(', '').replace('eval(', '').replace('document.write(', '')
     return content
 
@@ -45,21 +46,27 @@ def ultimate_unpacker(content):
 @bot.message_handler(content_types=['document'])
 def handle_docs(message):
     if message.document.file_name.lower().endswith('.html'):
-        m = bot.reply_to(message, "⚡ **PRO-MAX DECRYPTION IN PROGRESS... 100%**")
+        # 1 to 100 Loading Animation
+        m = bot.reply_to(message, "┌──────────────────────┐\n   🚀 DECRYPTING: 1%\n└──────────────────────┘")
+        
+        for p in [25, 55, 85, 100]:
+            time.sleep(0.3)
+            bot.edit_message_text(f"┌──────────────────────┐\n   🚀 DECRYPTING: {p}%\n└──────────────────────┘", message.chat.id, m.message_id)
+
         try:
             file_info = bot.get_file(message.document.file_id)
             data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
             
             # Execute Hard Decryption
-            decrypted = ultimate_unpacker(data)
+            decrypted = master_decrypt(data)
             
-            # Save and Return
-            new_file = f"DECRYPTED_ADITYA_{message.document.file_name}"
+            # Save File
+            new_file = f"DECRYPTED_{message.document.file_name}"
             with open(new_file, "w", encoding="utf-8") as f:
                 f.write(decrypted)
                 
             with open(new_file, "rb") as f:
-                # Clean Block Style Caption
+                # Clean Block Style Caption (No Stars)
                 cap = (
                     "┌──────────────────────┐\n"
                     "   👑 HTML DECRYPTION DONE ✅\n"
@@ -74,7 +81,7 @@ def handle_docs(message):
             bot.delete_message(message.chat.id, m.message_id)
             os.remove(new_file)
         except Exception as e:
-            bot.edit_message_text(f"❌ CRITICAL ERROR: {str(e)}", message.chat.id, m.message_id)
+            bot.edit_message_text(f"❌ ERROR: {str(e)}", message.chat.id, m.message_id)
     else:
         bot.reply_to(message, "❌ BHEI SIRF HTML FILE BHEJEIN!")
 
@@ -109,6 +116,7 @@ def callback_handler(call):
         )
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id, reply_markup=markup)
     elif call.data == "up":
-        bot.send_message(call.message.chat.id, "🔮 **PLEASE SEND YOUR HTML FILE**")
+        bot.send_message(call.message.chat.id, "🔮 PLEASE SEND YOUR HTML DECRYPT BOT")
 
 bot.infinity_polling()
+
