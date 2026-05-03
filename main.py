@@ -9,39 +9,38 @@ import os
 API_TOKEN = '8694242868:AAHw4p485GwDHnWQlxa7szVT8oqQZEtSf44'
 bot = telebot.TeleBot(API_TOKEN, parse_mode="MarkdownV2")
 
-# TERE LINKS
+# TERE DONO CHANNELS (FIXED)
 CHANNELS = ["-1003815161090", "-1003973812867"]
 LINKS = ["https://t.me/+_RZ0gN9HU6xhZTRl", "https://t.me/+7bNfhxLosYsxMmVl"]
 OWNER_LINK = "https://t.me/ADITYAXVIPBOT"
 
-# --- 🔥 ULTRA FAST INVISIBLE DECRYPTION 🔥 ---
-def fast_invisible_decrypt(content):
-    # Ye logic sirf encryption layers ko hatayega, UI ko touch nahi karega
-    for _ in range(10):
+# --- 🔥 ULTRA FAST HD DECRYPTION ENGINE 🔥 ---
+def ultra_fast_decrypt(content):
+    # Ye logic sirf script ke andar ka data nikalega, UI/Design ko touch nahi karega
+    for _ in range(20): # Deep layers ke liye 20 baar scan
         old_content = content
         
-        # 1. Base64 Auto-Unpacker (Design safe rakhta hai)
+        # 1. Base64/atob Unpacker (No Design Change)
         b64_pattern = r'atob\s*\(\s*[\'"]([A-Za-z0-9+/=]{20,})[\'"]\s*\)'
         matches = re.findall(b64_pattern, content)
         for b64 in matches:
             try:
                 decoded = base64.b64decode(b64).decode('utf-8', errors='ignore')
-                # Code replace karega par structure nahi todega
+                # Original content ko wahi replace karega bina tags tode
                 content = content.replace(f"atob('{b64}')", f"`{decoded}`")
                 content = content.replace(f'atob("{b64}")', f'`{decoded}`')
             except: pass
 
-        # 2. Hex aur Unicode Decode
+        # 2. Hex (\x) & Unicode (\u) Decode
         content = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), content)
         content = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), content)
         
         # 3. URL Unescape
         content = urllib.parse.unquote(content)
 
-        if old_content == content:
-            break
+        if old_content == content: break
             
-    # Sirf execution wrappers hatana hai taaki source code dikhe
+    # Sirf execution wrappers hatayenge taaki UI chalta rahe
     content = content.replace('eval(unescape(', '').replace('eval(', '')
     return content
 
@@ -76,21 +75,19 @@ def handle_query(call):
 @bot.message_handler(content_types=['document'])
 def handle_file(message):
     if message.document.file_name.endswith('.html'):
-        # 1 se 100 tak super fast animation (No Sleep)
-        m = bot.send_message(message.chat.id, "⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆: 𝟏%*")
+        # Instant Processing Message
+        m = bot.send_message(message.chat.id, "⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆: 𝟏𝟎𝟎%*")
         
-        # Fast animation loop
-        for i in [20, 50, 80, 100]:
-            bot.edit_message_text(f"⚡ *𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐍𝐆: {i}%*", message.chat.id, m.message_id)
-
         file_info = bot.get_file(message.document.file_id)
         data = bot.download_file(file_info.file_path).decode('utf-8', errors='ignore')
         
-        # Real Logic (No UI Change)
-        final_html = fast_invisible_decrypt(data)
+        # Super Fast Decrypt (UI Safe)
+        final_html = ultra_fast_decrypt(data)
 
         caption_text = f"""
 👑 *𝐇𝐓𝐌𝐋 𝐃𝐄𝐂𝐑𝐘𝐏𝐓𝐈𝐎𝐍 𝐃𝐎𝐍𝐄* ✅
+
+📱 *𝐏𝐇𝐎𝐍𝐄 𝐍𝐔𝐌𝐁𝐄𝐑 𝐄𝐗𝐓𝐑𝐀𝐂𝐓𝐄𝐃*
 
 🔐 *𝐂𝐡𝐚𝐧𝐧𝐞𝐥 𝟏:* {LINKS[0]}
 🔐 *𝐂𝐡𝐚𝐧𝐧𝐞𝐥 𝟐:* {LINKS[1]}
